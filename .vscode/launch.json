@@ -1,0 +1,20 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Debug Test",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/.venv/bin/pytest",
+            "args": [
+                "-s",
+                "tests/utils/test_mlx_module.py"
+            ],
+            "console": "integratedTerminal",
+            "env": {
+                "DEBUG": "True"
+            },
+            "justMyCode": false
+        }
+    ]
+}

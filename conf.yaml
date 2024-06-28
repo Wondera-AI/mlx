@@ -1,0 +1,81 @@
+src.lib.configs.TrainConfig:
+  _target_: src.lib.configs.TrainConfig
+  name: "experiment 1"
+  restore_checkpoint_path: null
+  start_epoch: 0
+  num_epochs: 10
+  start_workers: 3
+src.experiment.Datasets:
+  _target_: src.experiment.Datasets
+  train:
+    _target_: src.data.TrainDataset
+    batch_size: 32
+    unused_data_arg: 0
+  val:
+    _target_: src.data.ValDataset
+    batch_size: 32
+  test:
+    _target_: src.data.TestDataset
+    batch_size: 32
+src.experiment.Models:
+  _target_: src.experiment.Models
+  dnn:
+    _target_: src.model.DNN
+    input_size: 180
+    output_size: 10
+    layer_widths:
+    - 5
+    - 10
+    - 5
+    block:
+      _target_: src.model.BlockEg
+      input_size: 180
+    fc:
+      _target_: torch.nn.modules.linear.Linear
+      in_features: 1
+      out_features: 1
+      bias: true
+      device: null
+      dtype: null
+src.experiment.Optimizers:
+  _target_: src.experiment.Optimizers
+  adam:
+    _target_: torch.optim.adam.Adam
+    params: ???
+    lr: 0.001
+    betas:
+    - 0.9
+    - 0.999
+    eps: 1.0e-08
+    weight_decay: 0.0
+    amsgrad: false
+    foreach: null
+    maximize: false
+    capturable: false
+    differentiable: false
+    fused: null
+src.experiment.Losses:
+  _target_: src.experiment.Losses
+  loss1:
+    _target_: torchmetrics.regression.mse.MeanSquaredError
+    squared: true
+    num_outputs: 1
+  loss2:
+    _target_: src.losses.HuberLossMetric
+    delta: 1.0
+src.experiment.Metrics:
+  _target_: src.experiment.Metrics
+  mae:
+    _target_: torchmetrics.regression.mae.MeanAbsoluteError
+  mbd:
+    _target_: src.metrics.MeanBiasDeviation
+src.experiment.Tools:
+  _target_: src.experiment.Tools
+  early_stoppage:
+    _target_: src.tools.EarlyStopping
+    patience: 11
+    min_delta: 0
+  lr_scheduler:
+    _target_: src.tools.LRScheduler
+    warmup_steps: 500
+    total_steps: 10000

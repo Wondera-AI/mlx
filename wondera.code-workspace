@@ -1,0 +1,132 @@
+{
+    "folders": [
+        {
+            "path": "."
+        }
+    ],
+    "settings": {
+        "editor.defaultFormatter": "ms-python.black-formatter",
+        "editor.codeActionsOnSave": {
+            "source.organizeImports": "explicit"
+        },
+        "editor.formatOnSave": true,
+        "files.autoSave": "afterDelay",
+        "editor.formatOnPaste": true,
+        // Was added to supposedly improve tailwind css autocomplete, but it adds loads of suggestions to other things which are really annoying,
+        // it also seems to work fine without it, so leaving out.
+        // "editor.quickSuggestions": {
+        //     "strings": true
+        // },
+        "[python]": {
+            "editor.defaultFormatter": "ms-python.black-formatter",
+            "editor.formatOnSave": true,
+            "editor.formatOnPaste": false,
+            "formatting.provider": "ruff",
+            "linting.enabled": true,
+            "linting.ruffPath": "./venv/bin/ruff",
+            "linting.ruffArgs": [
+                "--line-length=88"
+            ],
+            "analysis.exclude": [
+                "tests/*",
+            ],
+            "analysis.autoImportCompletions": false,
+
+            // "linting.lintOnSave": true,
+            // "editor.codeActionsOnSave": {
+            //     "source.fixAll": true
+            // }
+        },
+        "notebook.output.textLineLimit": 78,
+        "files.exclude": {
+            "**/venv": true,
+        },
+        // "[rust]": {
+        //     "editor.defaultFormatter": "rust-lang.rust-analyzer",
+        //     "editor.formatOnSave": true
+        // },
+        // "rust-analyzer.linkedProjects": [
+        //     "./backend/rust/fit_parsing/Cargo.toml",
+        //     "./backend/rust/numerical_utils/Cargo.toml",
+        //     "./backend/rust/data_manager/Cargo.toml"
+        // ],
+        // "python.linting.pylintEnabled": false,
+        // "python.linting.flake8Enabled": true,
+        // "python.linting.enabled": true,
+        // "python.formatting.provider": "ruff",
+        // "python.formatting.blackArgs": [
+        //     "--line-length=88"
+        // ],
+        // "python.linting.flake8Args": [
+        //     "--disable=E203",
+        //     "--ignore=E266",
+        //     "--ignore=E501",
+        //     "--ignore=W503",
+        //     // "--max-line-length=88",
+        //     // "--max-line-length=78",
+        //     // "--ignore=E501",
+        // ],
+        // "python.analysis.exclude": [
+        //     "fog_park/*",
+        //     "dev_scripts/*",
+        //     "*.ipynb"
+        // ],
+        // "python.analysis.autoImportCompletions": false,
+        // // "python.formatting.blackPath": "./venv/bin/black",
+        // "python.linting.flake8Path": "./venv/bin/flake8",
+        // "python.linting.mypyEnabled": true,
+        // // "ruff.path": "charliermarsh.ruff",
+        // "ruff.args": [
+        //     "--line-length=88"
+        // ],
+        // // "mypy.targets": [],
+        // // "mypy.dmypyExecutable": "./venv/bin/dmypy",
+        // "python.linting.mypyArgs": [
+        //     "--cache-dir=.mypy_cache/.vscode"
+        // ],
+        // "mypy.configFile": "pyproject.toml",
+        // "search.useIgnoreFiles": false,
+        // "scss.lint.unknownAtRules": "ignore",
+        // "files.exclude": {
+        //     "**/venv": true,
+        // },
+        // "search.exclude": {
+        //     "**/.*": true,
+        //     "**/*.json": true
+        // },
+        // "editor.formatOnSave": true,
+        // "files.autoSave": "afterDelay",
+        // "editor.formatOnPaste": true,
+        // "black-formatter.args": [
+        //     "--line-length=88"
+        // ],
+        // "python.linting.mypyPath": "pdm run mypy",
+        // "mypy.dmypyExecutable": "pdm run dmypy",
+        // "html.format.wrapLineLength": 88
+    },
+    // "launch": {
+    //     "version": "0.2.0",
+    //     "configurations": [
+    //         {
+    //             "justMyCode": false,
+    //             "name": "Python: Monitor Port 54321",
+    //             "type": "python",
+    //             "request": "attach",
+    //             "connect": {
+    //                 "host": "localhost",
+    //                 "port": 54321
+    //             }
+    //         }
+    //     ]
+    // },
+    "tasks": {
+        "version": "2.0.0",
+        "tasks": [
+            {
+                "label": "echo",
+                "type": "shell",
+                "command": "echo Hello"
+            }
+        ]
+    }
+}

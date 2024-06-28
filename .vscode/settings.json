@@ -1,0 +1,11 @@
+{
+    "python.formatting.provider": "none",
+    "editor.codeActionsOnSave": {
+      "source.organizeImports": "explicit"
+    },
+    "editor.formatOnSave": true,
+    "python.linting.enabled": true,
+    "python.linting.ruffEnabled": true,
+    "python.linting.ruffArgs": ["check", "--fix", "--select", "I"]
+  }
+  

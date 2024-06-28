@@ -1,0 +1,99 @@
+[project]
+name = "service"
+version = "0.1.0"
+description = "Default template for PDM package"
+authors = [{ name = "alelat19", email = "alelat19@gmail.com" }]
+dependencies = [
+    "pydantic>=2.7.3",
+    "ruff>=0.4.7",
+    "torch>=2.3.1",
+    "numpy>=2.0.0",
+    "hydra-zen>=0.13.0",
+    "pandas>=2.2.2",
+    "pyarrow>=16.1.0",
+    "ray[default]>=2.30.0",
+    "torchmetrics>=1.4.0.post0",
+]
+requires-python = "==3.11.*"
+readme = "README.md"
+license = { text = "MIT" }
+
+[tool.pyright]
+include = ["src"]
+# venvPath = "pyth/.venv"
+venv = ".venv"
+reportMissingImports = true
+reportMissingTypeStubs = false
+
+[tool.pdm]
+distribution = false
+
+[tool.ruff]
+# Enable the pycodestyle (`E`) and Pyflakes (`F`) rules by default.
+# Unlike Flake8, Ruff doesn't enable pycodestyle warnings (`W`) or
+# McCabe complexity (`C901`) by default.
+lint.select = [
+    # pyflakes
+    "F",
+    # pycodestyle
+    "E",
+    "W",
+    # flake8-2020
+    "YTT",
+    # flake8-bugbear
+    "B",
+    # flake8-commas
+    "COM",
+    # flake8-datetimez
+    "DTZ",
+    # flake8-debugger
+    "T10",
+    # flake8-gettext
+    "INT",
+    # flake8-quotes
+    "Q",
+    # pylint
+    "PL",
+    # misc lints
+    "PIE",
+    # flake8-pyi
+    "PYI",
+    # tidy imports
+    "TID",
+    # implicit string concatenation
+    "ISC",
+    # type-checking imports
+    "TCH",
+    # isort
+    # "I",
+    # comprehensions
+    "C4",
+    # pygrep-hooks
+    "PGH",
+    # Ruff-specific rules
+    "RUF",
+    # Upgrade syntax
+    "UP",
+    # one-blank-line-before-class
+    "D203",
+    # one-blank-line-after-class
+    "D204",
+    # "I001",
+    # "I002", 
+    # "I003", 
+    # "I004"
+]
+lint.ignore = [
+    "E402",
+    "B008",
+    "B006",
+    "E731",
+    # too many arguments to function call
+    "PLR0913",
+
+] #"E501"
+
+lint.fixable = ["ALL"]
+
+line-length = 88
+
