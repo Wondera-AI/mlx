@@ -43,7 +43,7 @@ class Models:
         # assing you model to class
         self.dnn = dnn
         # need to inform ray of model to optimizer mapping for instantiation
-        self.map_params_to_optimizers = {self.dnn: Adam}
+        self.map_params_to_optimizers = {"dnn": "adam"}
 
 
 # define as many optimizers as you want
@@ -112,10 +112,12 @@ class Experiment(BaseModule):
             tools=tools,
             # paths=paths,
         )
-        # NOTE as per earlier you can override the default values here if you want runtime specific values
+        # TODO move into worker - as per earlier you can override the default values here if you want runtime specific values
         # in this case we want to override our LRScheduler to leverage the dataset runtime values
         self.tools.lr_scheduler.total_steps = (
-            len(self.datasets.train) // self.cfg.batch_size * self.cfg.num_epochs
+            len(self.datasets.train)
+            // self.datasets.train.batch_size
+            * self.cfg.num_epochs
         )
 
     # NOTE dataset_shards: not strictly typed but you can access all "Datasets" attributes
@@ -127,22 +129,38 @@ class Experiment(BaseModule):
         # - e.g. self.models.resnet = self.models.resnet.to(get_device())
 
         print("Starting worker loop")
-        print("Dataset Shards:", dataset_shards)
+        print("Dataset Shards:", dataset_shards.train)
 
         # NOTE generate dataloaders
-        # train_loader = dataset_shards.train.iter_torch_batches(
-        #     batch_size=self.cfg.batch_size,
-        #     prefetch_batches=3,
-        # )
-        train_loader = DataLoader(
-            dataset_shards,
-            batch_size=self.cfg.batch_size,
-            shuffle=False,
+        # print("SHARD DS", len(dataset_shards.train))
+        train_loader = dataset_shards.train.iter_torch_batches(
+            batch_size=self.datasets.train.batch_size,
+            prefetch_batches=self.cfg.prefetch_batches,
+            collate_fn=self.datasets.train.ray_map_batches,
+            # device=get_device(),
         )
+        for _, batch in enumerate(train_loader):
+            # print("SHARD BATCN len:", len(batch))
+            print("SHARD BATCH", batch["data"].shape, batch["label"].shape)
+
+        train_loader, _, _ = self.generate_loaders()
+        # train_loader = DataLoader(
+        #     dataset_shards,
+        #     batch_size=self.datasets.train.batch_size,
+        #     shuffle=False,
+        # )
 
         # for _, batch in enumerate(
         #     dataset_shards.iter_torch_batches(
-        #         batch_size=self.cfg.batch_size,
+        #         batch_size=32,
+        #         collate_fn=self.datasets.train.ray_map_batches,
+        #     ),
+        # ):
+        #     print(batch["data"].shape, batch["label"].shape)
+
+        # for _, batch in enumerate(
+        #     dataset_shards.train.iter_torch_batches(
+        #         batch_size=self.datasets.train.batch_size,
         #         device=get_device(),
         #     ),
         # ):

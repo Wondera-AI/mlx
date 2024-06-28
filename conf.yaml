@@ -5,6 +5,7 @@ src.lib.configs.TrainConfig:
   start_epoch: 0
   num_epochs: 10
   start_workers: 3
+  prefetch_batches: 2
 src.experiment.Datasets:
   _target_: src.experiment.Datasets
   train:
