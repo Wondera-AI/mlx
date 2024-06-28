@@ -16,7 +16,7 @@ class TrainDataset(Dataset):
 
         # do what ever to load your data here - os walks etc...
         self.data = torch.randn(1000, 180)
-        self.labels = torch.randint(0, 10, (1000,))
+        self.labels = torch.randn(1000, 10)  # Adjust labels to match output shape
 
     def __len__(self):
         return len(self.data)
@@ -39,10 +39,10 @@ class TrainDataset(Dataset):
 
         batch = batch["item"]  # and yes unfornutaley you must retrieve from item
         # but then you get access to the __getitem__ return signature
-        data = torch.stack([torch.tensor(row[0]) for row in batch])
-        labels = torch.stack([torch.tensor(row[1]) for row in batch])
+        data = torch.stack([row[0].clone().detach() for row in batch])
+        labels = torch.stack([row[1].clone().detach() for row in batch])
 
-        return {"data": data, "label": labels}
+        return {"inputs": data, "label": labels}
 
 
 class ValDataset(Dataset):
@@ -63,8 +63,8 @@ class ValDataset(Dataset):
     @staticmethod
     def ray_map_batches(batch):
         batch = batch["item"]
-        data = torch.stack([torch.tensor(row[0]) for row in batch])
-        labels = torch.stack([torch.tensor(row[1]) for row in batch])
+        data = torch.stack([row[0].clone().detach() for row in batch])
+        labels = torch.stack([row[1].clone().detach() for row in batch])
 
         return {"data": data, "label": labels}
 
@@ -87,8 +87,8 @@ class TestDataset(Dataset):
     @staticmethod
     def ray_map_batches(batch):
         batch = batch["item"]
-        data = torch.stack([torch.tensor(row[0]) for row in batch])
-        labels = torch.stack([torch.tensor(row[1]) for row in batch])
+        data = torch.stack([row[0].clone().detach() for row in batch])
+        labels = torch.stack([row[1].clone().detach() for row in batch])
 
         return {"data": data, "label": labels}
 

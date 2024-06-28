@@ -1,12 +1,9 @@
-from typing import Any
-
 import torch
-import torch.distributed as dist
 import torchmetrics as tm
-from ray import get, train
-from ray.train.torch import get_device, prepare_data_loader, prepare_model
+from ray import train
+from ray.train.torch import prepare_model
 from torch.optim import Adam
-from torch.utils.data import DataLoader, Dataset
+from torch.utils.data import DataLoader
 
 import src.losses as custom_losses
 import src.metrics as custom_metrics
@@ -110,7 +107,7 @@ class Experiment(BaseModule):
             tools=tools,
             # paths=paths,
         )
-        # TODO move into worker - as per earlier you can override the default values here if you want runtime specific values
+        # TODO as per earlier you can override the default values here if you want runtime specific values
         # in this case we want to override our LRScheduler to leverage the dataset runtime values
         self.tools.lr_scheduler.total_steps = (
             len(self.datasets.train)
@@ -140,25 +137,32 @@ class Experiment(BaseModule):
                 print(f"Early stopping at epoch {epoch}")
                 break
 
-        # self.save_checkpoint(
-        #     epoch=epoch,
-        #     metrics={},
-        # )
+            # self.save_checkpoint(
+            #     epoch=epoch,
+            #     metrics={},
+            # )
 
     def train_steps(self, dataloader: DataLoader, epoch: int):
         self.reset_all_metrics_and_losses()
         for batch_idx, batch in enumerate(dataloader):
-            x, y = batch
+            x = batch["inputs"]
+            y = batch["label"]
 
             output = self.models.dnn(x)
+
+            # local loss compute and gradient calculation
+            loss = self.losses.loss1(output, y)
+            loss.backward()
+
+            # updating losses and metrics as desired
+            # NOTE: you will get warnings if you save metrics & losses without updating them
             self.losses.loss1.update(output, y)
+            self.metrics.mae.update(output, y)
 
             # self.save_metrics_and_losses(
             #     batch_idx=batch_idx,
             #     epoch=epoch,
             # )
-
-            self.losses.loss1.backward()
 
             self.optimizers.adam.step()
             self.optimizers.adam.zero_grad()
