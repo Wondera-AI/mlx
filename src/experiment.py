@@ -143,7 +143,10 @@ class Experiment(BaseModule):
             # print("SHARD BATCN len:", len(batch))
             print("SHARD BATCH", batch["data"].shape, batch["label"].shape)
 
-        train_loader, _, _ = self.generate_loaders()
+        train_loader, _, _ = self.generate_loaders(dataset_shards=dataset_shards)
+        for _, batch in enumerate(train_loader):
+            # print("SHARD BATCN len:", len(batch))
+            print("SHARD BATCH", batch["data"].shape, batch["label"].shape)
         # train_loader = DataLoader(
         #     dataset_shards,
         #     batch_size=self.datasets.train.batch_size,
