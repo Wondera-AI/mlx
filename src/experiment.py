@@ -3,9 +3,7 @@ from typing import Any
 import torch
 import torch.distributed as dist
 import torchmetrics as tm
-
-# from ray import train
-from ray import get
+from ray import get, train
 from ray.train.torch import get_device, prepare_data_loader, prepare_model
 from torch.optim import Adam
 from torch.utils.data import DataLoader, Dataset
@@ -128,69 +126,19 @@ class Experiment(BaseModule):
         # NOTE manually put non trainable model on device
         # - e.g. self.models.resnet = self.models.resnet.to(get_device())
 
-        print("Starting worker loop")
-        print("Dataset Shards:", dataset_shards.train)
-
-        # NOTE generate dataloaders
-        # print("SHARD DS", len(dataset_shards.train))
-        train_loader = dataset_shards.train.iter_torch_batches(
-            batch_size=self.datasets.train.batch_size,
-            prefetch_batches=self.cfg.prefetch_batches,
-            collate_fn=self.datasets.train.ray_map_batches,
-            # device=get_device(),
-        )
-        for _, batch in enumerate(train_loader):
-            # print("SHARD BATCN len:", len(batch))
-            print("SHARD BATCH", batch["data"].shape, batch["label"].shape)
-
         train_loader, _, _ = self.generate_loaders(dataset_shards=dataset_shards)
-        for _, batch in enumerate(train_loader):
-            # print("SHARD BATCN len:", len(batch))
-            print("SHARD BATCH", batch["data"].shape, batch["label"].shape)
-        # train_loader = DataLoader(
-        #     dataset_shards,
-        #     batch_size=self.datasets.train.batch_size,
-        #     shuffle=False,
-        # )
 
-        # for _, batch in enumerate(
-        #     dataset_shards.iter_torch_batches(
-        #         batch_size=32,
-        #         collate_fn=self.datasets.train.ray_map_batches,
-        #     ),
-        # ):
-        #     print(batch["data"].shape, batch["label"].shape)
+        for epoch in range(self.cfg.start_epoch, self.cfg.num_epochs):
+            print(
+                f"Epoch START: {epoch}, world rank: {train.get_context().get_world_rank()}"
+            )
 
-        # for _, batch in enumerate(
-        #     dataset_shards.train.iter_torch_batches(
-        #         batch_size=self.datasets.train.batch_size,
-        #         device=get_device(),
-        #     ),
-        # ):
-        #     print("Batch len:", len(batch))
+            self.train_steps(dataloader=train_loader, epoch=epoch)
 
-        # train_loader = dataset_shards.iter_torch_batches(
-        #     batch_size=self.cfg.batch_size,
-        #     prefetch_batches=3,
-        #     collate_fn=collate_fn,
-        # )
-        # must wrap to distribute across workers and devices
-        # train_loader = prepare_data_loader(dataloader_train)
-        # val_loader ...
-
-        # print("NODE RANK", train.get_context().get_world_rank())
-
-        # for epoch in range(self.cfg.start_epoch, self.cfg.num_epochs):
-        #     print(
-        #         f"Epoch START: {epoch}, world rank: {train.get_context().get_world_rank()}"
-        #     )
-
-        #     self.train_steps(dataloader=train_loader, epoch=epoch)
-
-        #     dummy_val_loss = 69
-        #     if self.tools.early_stoppage(dummy_val_loss):
-        #         print(f"Early stopping at epoch {epoch}")
-        #         break
+            dummy_val_loss = 69
+            if self.tools.early_stoppage(dummy_val_loss):
+                print(f"Early stopping at epoch {epoch}")
+                break
 
         # self.save_checkpoint(
         #     epoch=epoch,
@@ -205,10 +153,10 @@ class Experiment(BaseModule):
             output = self.models.dnn(x)
             self.losses.loss1.update(output, y)
 
-            self.save_metrics_and_losses(
-                batch_idx=batch_idx,
-                epoch=epoch,
-            )
+            # self.save_metrics_and_losses(
+            #     batch_idx=batch_idx,
+            #     epoch=epoch,
+            # )
 
             self.losses.loss1.backward()
 
