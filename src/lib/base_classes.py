@@ -38,13 +38,6 @@ class BaseModule(ABC):
     def worker_loop(self, dataset_shards: Any):
         raise NotImplementedError
 
-    def restore(self):
-        # TODO load metrics
-        print("Restore not implemented")
-
-    def init_tensorboard(self):
-        print("Init tensorboard not implemented")
-
     @classmethod
     def init_module(
         cls,

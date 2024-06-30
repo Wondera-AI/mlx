@@ -205,11 +205,11 @@ def _handle_param(param, param_default):
         return param
 
     if isinstance(param_default, nn.Module | Dataset | Optimizer | Metric):
-        # TODO if param_default is nn.Module
         return create_builds_config(param_default.__class__)
 
     if "tools" in f"{param.__module__}.{param.__qualname__}":
-        # NOTE-dev tools we cannot cheat to recurse into, instead we inspect if tools are within the path
+        # NOTE-dev tools we cannot cheat by recursing into any class or we get stack overflow
+        # instead we inspect if tools are within the path
         # put tools classes inside some .tools. path
         return create_builds_config(param_default.__class__)
 

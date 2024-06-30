@@ -1,6 +1,6 @@
 import torch
 import torchmetrics as tm
-from ray import train
+from ray import get_device, train
 from ray.train.torch import prepare_model
 from torch.optim import Adam
 from torch.utils.data import DataLoader
@@ -35,7 +35,7 @@ class Models:
         self,
         dnn: DNN = DNN(),
     ) -> None:
-        # assing you model to class
+        # assign model to class self
         self.dnn = dnn
         # need to inform ray of model to optimizer mapping for instantiation
         self.map_params_to_optimizers = {"dnn": "adam"}
@@ -45,7 +45,9 @@ class Models:
 class Optimizers:
     def __init__(
         self,
-        adam: Adam = Adam(DUMMY_PARAMS),
+        adam: Adam = Adam(
+            DUMMY_PARAMS
+        ),  # have to pass dummy params to compile - replaced by mapped model params at runtime
     ) -> None:
         self.adam = adam
 
@@ -57,7 +59,6 @@ class Losses:
         loss1: tm.MeanSquaredError = tm.MeanSquaredError(),
         loss2: custom_losses.HuberLossMetric = custom_losses.HuberLossMetric(),
     ) -> None:
-        # ensure you assign each to self
         self.loss1 = loss1
         self.loss2 = loss2
 
@@ -95,7 +96,6 @@ class Experiment(BaseModule):
         optimizers: Optimizers,
         metrics: Metrics,
         tools: Tools,
-        # paths: dict,
     ):
         super().__init__(
             cfg=cfg,
@@ -105,7 +105,6 @@ class Experiment(BaseModule):
             losses=losses,
             metrics=metrics,
             tools=tools,
-            # paths=paths,
         )
         # TODO as per earlier you can override the default values here if you want runtime specific values
         # in this case we want to override our LRScheduler to leverage the dataset runtime values
@@ -117,11 +116,11 @@ class Experiment(BaseModule):
 
     # NOTE dataset_shards: not strictly typed but you can access all "Datasets" attributes
     def worker_loop(self, dataset_shards):
-        # prepar trainable model for train synchronizations - wrapper for DDP
+        # prepare trainable model for train synchronizations - wrapper for DDP
         self.models.dnn = prepare_model(self.models.dnn)
 
-        # NOTE manually put non trainable model on device
-        # - e.g. self.models.resnet = self.models.resnet.to(get_device())
+        # NOTE - prepare non-trained model for inference
+        # self.models.resnet = self.models.resnet.to(get_device())
 
         train_loader, _, _ = self.generate_loaders(dataset_shards=dataset_shards)
 
@@ -137,10 +136,10 @@ class Experiment(BaseModule):
                 print(f"Early stopping at epoch {epoch}")
                 break
 
-            # self.save_checkpoint(
-            #     epoch=epoch,
-            #     metrics={},
-            # )
+            self.save_checkpoint(
+                epoch=epoch,
+                metrics={},
+            )
 
     def train_steps(self, dataloader: DataLoader, epoch: int):
         self.reset_all_metrics_and_losses()
@@ -159,10 +158,10 @@ class Experiment(BaseModule):
             self.losses.loss1.update(output, y)
             self.metrics.mae.update(output, y)
 
-            # self.save_metrics_and_losses(
-            #     batch_idx=batch_idx,
-            #     epoch=epoch,
-            # )
+            self.save_metrics_and_losses(
+                batch_idx=batch_idx,
+                epoch=epoch,
+            )
 
             self.optimizers.adam.step()
             self.optimizers.adam.zero_grad()
