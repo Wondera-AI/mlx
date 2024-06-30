@@ -106,7 +106,7 @@ class Experiment(BaseModule):
             metrics=metrics,
             tools=tools,
         )
-        # TODO as per earlier you can override the default values here if you want runtime specific values
+        # NOTE as per earlier you can override the default values here if you want runtime specific values
         # in this case we want to override our LRScheduler to leverage the dataset runtime values
         self.tools.lr_scheduler.total_steps = (
             len(self.datasets.train)
