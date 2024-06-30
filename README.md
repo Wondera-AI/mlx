@@ -171,7 +171,7 @@ class Experiment(BaseModule):
         # do whatever here
 ```
 
-But in reality training a neural network has generalizeable priors. Our experiment class takes a configuriation class (TrainConfig), models, datasets, losses, optimizers, metrics and tools.
+But in reality training a neural network requires generalizeable actions. Our experiment class takes a configuriation class (TrainConfig), models, datasets, losses, optimizers, metrics and tools.
 
 ```python
 class Experiment(BaseModule):
