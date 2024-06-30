@@ -1,6 +1,6 @@
 # Distributed Neural Network Experiment Manager
 
-Simply train neural networks and manage experiments on a Ray clusters in Pytorch. This library easily distributes model training using Torch's Distributed Data Parallel, whilst using Ray to automatically manage actors, tasks, heads and workers.
+Simply train neural networks and manage experiments on a Ray clusters in PyTorch. This library easily distributes model training using Torch's Distributed Data Parallel, whilst using Ray to automatically manage actors, tasks, heads and workers.
 
 ## Python Packages Used:
 - **Ray Train**: creates train job in Ray enviroment
